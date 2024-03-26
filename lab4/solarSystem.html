@@ -29,9 +29,12 @@ function MatrixMul(a,b) //Mnożenie macierzy
   return c;
 }
 
+function CreatePlanet( scale,  xStart, yStart){
+  
+}
+
 function startGL() 
 {
-  alert("StartGL");
   let canvas = document.getElementById("canvas3D"); //wyszukanie obiektu w strukturze strony 
   gl = canvas.getContext("experimental-webgl"); //pobranie kontekstu OpenGL'u z obiektu canvas
   gl.viewportWidth = canvas.width; //przypisanie wybranej przez nas rozdzielczości do systemu OpenGL
@@ -103,19 +106,55 @@ function startGL()
     +1.0, +1.0, -1.0,  -1.0, -1.0, -1.0,  -1.0, +1.0, -1.0,
   //Bottom
     -1.0, -1.0, +1.0,  -1.0, -1.0, -1.0,  +1.0, -1.0, +1.0,
-    +1.0, -1.0, +1.0,  -1.0, -1.0, -1.0,  +1.0, -1.0, -1.0
+    +1.0, -1.0, +1.0,  -1.0, -1.0, -1.0,  +1.0, -1.0, -1.0,
+      //Top
+  2.0, +1.0, -1.0,  2.0, +1.0, +1.0,  4.0, +1.0, +1.0, // First triangle
+  2.0, +1.0, -1.0,  4.0, +1.0, +1.0,  4.0, +1.0, -1.0, // Second triangle
+  //Left
+  2.0, -1.0, +1.0,  2.0, +1.0, +1.0,  2.0, -1.0, -1.0, // First triangle
+  2.0, -1.0, -1.0,  2.0, +1.0, +1.0,  2.0, +1.0, -1.0, // Second triangle
+  //Right
+  4.0, +1.0, +1.0,  4.0, -1.0, +1.0,  4.0, -1.0, -1.0, // First triangle
+  4.0, +1.0, +1.0,  4.0, -1.0, -1.0,  4.0, +1.0, -1.0, // Second triangle
+  //Front
+  4.0, -1.0, +1.0,  4.0, +1.0, +1.0,  2.0, -1.0, +1.0, // First triangle
+  2.0, +1.0, +1.0,  2.0, -1.0, +1.0,  4.0, +1.0, +1.0, // Second triangle
+  //Back
+  4.0, +1.0, -1.0,  4.0, -1.0, -1.0,  2.0, -1.0, -1.0, // First triangle
+  4.0, +1.0, -1.0,  2.0, -1.0, -1.0,  2.0, +1.0, -1.0, // Second triangle
+  //Bottom
+  2.0, -1.0, +1.0,  2.0, -1.0, -1.0,  4.0, -1.0, +1.0, // First triangle
+  4.0, -1.0, +1.0,  2.0, -1.0, -1.0,  4.0, -1.0, -1.0  // Second triangle
   ]
 
   vertexPositionBuffer = gl.createBuffer(); //Stworzenie tablicy w pamieci karty graficznej
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPosition), gl.STATIC_DRAW);
   vertexPositionBuffer.itemSize = 3; //zdefiniowanie liczby współrzednych per wierzchołek
-  vertexPositionBuffer.numItems = 12; //Zdefinoiowanie liczby punktów w naszym buforze
+  vertexPositionBuffer.numItems = 24; //Zdefinoiowanie liczby punktów w naszym buforze
 
   //Opis sceny 3D, kolor każdego z wierzchołków
   let vertexColor = [
   //Top
     1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0, //3 punkty po 3 składowe - R1,G1,B1, R2,G2,B2, R3,G3,B3 - 1 trójkąt
+    1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+  //Left
+    0.0, 1.0, 0.0,  0.0, 1.0, 0.0,  0.0, 1.0, 0.0,
+    0.0, 1.0, 0.0,  0.0, 1.0, 0.0,  0.0, 1.0, 0.0,
+  //Right
+    0.0, 0.0, 1.0,  0.0, 0.0, 1.0,  0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,  0.0, 0.0, 1.0,  0.0, 0.0, 1.0,
+  //Front
+    1.0, 1.0, 0.0,  1.0, 1.0, 0.0,  1.0, 1.0, 0.0,
+    1.0, 1.0, 0.0,  1.0, 1.0, 0.0,  1.0, 1.0, 0.0,
+  //Back
+    1.0, 0.0, 1.0,  1.0, 0.0, 1.0,  1.0, 0.0, 1.0,
+    1.0, 0.0, 1.0,  1.0, 0.0, 1.0,  1.0, 0.0, 1.0,
+  //Bottom
+    0.0, 1.0, 1.0,  0.0, 1.0, 1.0,  0.0, 1.0, 1.0,
+    0.0, 1.0, 1.0,  0.0, 1.0, 1.0,  0.0, 1.0, 1.0,
+      //Top
+      1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0, //3 punkty po 3 składowe - R1,G1,B1, R2,G2,B2, R3,G3,B3 - 1 trójkąt
     1.0, 0.0, 0.0,  1.0, 0.0, 0.0,  1.0, 0.0, 0.0,
   //Left
     0.0, 1.0, 0.0,  0.0, 1.0, 0.0,  0.0, 1.0, 0.0,
@@ -143,6 +182,24 @@ function startGL()
   let vertexCoords = [
   //Top
     0.0, 0.0,  1.0, 0.0,  1.0, 1.0, //3 punkty po 2 składowe - U1,V1, U2,V2, U3,V3 - 1 trójkąt
+    0.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+  //Left
+    1.0, 0.0,  1.0, 1.0,  0.0, 0.0,//x
+    0.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+  //Right
+    0.0, 0.0,  1.0, 0.0,  1.0, 1.0,
+    0.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+  //Front
+    0.0, 0.0,  1.0, 0.0,  0.0, 1.0,
+    1.0, 1.0,  0.0, 1.0,  1.0, 0.0,
+  //Back
+    0.0, 0.0,  1.0, 0.0,  1.0, 1.0,
+    0.0, 0.0,  1.0, 1.0,  0.0, 1.0,
+  //Bottom
+    0.0, 0.0,  0.0, 1.0,  1.0, 0.0,
+    1.0, 0.0,  0.0, 1.0,  1.0, 1.0,
+      //Top
+      0.0, 0.0,  1.0, 0.0,  1.0, 1.0, //3 punkty po 2 składowe - U1,V1, U2,V2, U3,V3 - 1 trójkąt
     0.0, 0.0,  1.0, 1.0,  0.0, 1.0,
   //Left
     1.0, 0.0,  1.0, 1.0,  0.0, 0.0,//x
@@ -197,8 +254,8 @@ function startGL()
 var angleZ = 0.0;
 var angleY = 0.0;
 var angleX = 0.0;
-var tz = -5.0;
-
+var tz = -10.0;
+var tx = 0.0;
 function Tick()
 {  
   let uMVMatrix = [
@@ -235,7 +292,13 @@ function Tick()
   0,0,1,0,
   0,0,tz,1
   ];
- 
+  let uMVTranslateX = [
+    1,0,0,0,
+    0,1,0,0,
+    0,0,1,0,
+    tx,0,0,1
+  ]
+  uMVMatrix = MatrixMul(uMVMatrix,uMVTranslateX);
   uMVMatrix = MatrixMul(uMVMatrix,uMVRotX);
   uMVMatrix = MatrixMul(uMVMatrix,uMVRotY);
   uMVMatrix = MatrixMul(uMVMatrix,uMVRotZ);
@@ -284,6 +347,8 @@ function handlekeydown(e)
  if(e.keyCode==65) angleY=angleY-1.0;
  if(e.keyCode==81) angleZ=angleZ+1.0;
  if(e.keyCode==69) angleZ=angleZ-1.0;
+  if(e.keyCode==37) tx=tx+0.5;
+  if(e.keyCode==39) tx=tx-0.5;
  //alert(e.keyCode);
  //alert(angleX);
 }
