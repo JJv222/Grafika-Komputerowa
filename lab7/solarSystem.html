@@ -28,7 +28,6 @@ function MatrixMul(a,b) //Mnożenie macierzy
   }
   return c;
 }
-
 function CreatePlanet( scale,  xStart, yStart, shift=0){
   let xLeft = xStart - (1.0*scale);
   let xRight = xStart + (1.0*scale);
@@ -134,36 +133,9 @@ function startGL()
   gl.linkProgram(shaderProgram);
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) alert("Could not initialise shaders");  //Sprawdzenie ewentualnych błedów
 
-// Planet Creation
-  let vertexPosition = CreatePlanet(25.0,-15.0,0.0); //sun 
-  vertexPosition = vertexPosition.concat(CreatePlanet(1, 21.0, 0.0)); // mercury
-  vertexPosition = vertexPosition.concat(CreatePlanet(2.3, 35.0, 0.0,-25)); // venus
-  vertexPosition = vertexPosition.concat(CreatePlanet(2.3, 53.0, 0.0)); // earth
-  vertexPosition = vertexPosition.concat(CreatePlanet(1.4, 70.0, 0.0,25)); // mars
-  vertexPosition = vertexPosition.concat(CreatePlanet(14.0, 100.0, 0.0,-16)); // jupiter
-  vertexPosition = vertexPosition.concat(CreatePlanet(11.3, 151.0, 0.0,+16)); // saturn
-  vertexPosition = vertexPosition.concat(CreatePlanet(5.7, 190.0, 0.0,-34)); // uranus
-  vertexPosition = vertexPosition.concat(CreatePlanet(5.0, 220.0, 0.0)); // neptune
-  vertexPosition = vertexPosition.concat(CreatePlanet(0.5, 250.0, 0.0,9)); // pluto
-  //Opis sceny 3D, położenie punktów w przestrzeni 3D w formacie X,Y,Z 
-  vertexPositionBuffer = gl.createBuffer(); //Stworzenie tablicy w pamieci karty graficznej
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPosition), gl.STATIC_DRAW);
-  vertexPositionBuffer.itemSize = 3; //zdefiniowanie liczby współrzednych per wierzchołek
-  vertexPositionBuffer.numItems = 120; //Zdefinoiowanie liczby punktów w naszym buforze
-
-
 //Texture Creation
   let vertexCoords = CreateTexture(6);
   vertexCoords = vertexCoords.concat(CreateTexture(9));
-  vertexCoords = vertexCoords.concat(CreateTexture(5));
-  vertexCoords = vertexCoords.concat(CreateTexture(4));
-  vertexCoords = vertexCoords.concat(CreateTexture(3));
-  vertexCoords = vertexCoords.concat(CreateTexture(2));
-  vertexCoords = vertexCoords.concat(CreateTexture(1));
-  vertexCoords = vertexCoords.concat(CreateTexture(0));
-  vertexCoords = vertexCoords.concat(CreateTexture(8));
-  vertexCoords = vertexCoords.concat(CreateTexture(7));
   vertexCoordsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexCoordsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexCoords), gl.STATIC_DRAW);
@@ -196,6 +168,38 @@ function startGL()
   Tick();
 } 
 
+var SelfRotates = [];
+function CreateAndSelftRotatePlanet(){
+  // Planet Creation
+  let time = new Date().getTime() * 0.001; // Get current time in milliseconds and convert to seconds for smoother motion
+  let Start_X = 0.0; 
+  let Start_Radius = 21.0; 
+//Sun
+let vertexPosition = CreatePlanet(25.0,-15.0,0.0); //sun 
+Start_X = Start_X + 25.0;
+  let mercuryX = ((Start_X+w)*Math.cos(time))-15;
+  let mercuryZ =  (Start_X+25)*Math.sin(time);
+
+
+  vertexPosition = vertexPosition.concat(CreatePlanet(3, mercuryX, 0,mercuryZ)); // mercuryw
+
+
+
+
+
+
+
+
+
+  vertexPositionBuffer = gl.createBuffer(); //Stworzenie tablicy w pamieci karty graficznej
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPosition), gl.STATIC_DRAW);
+  vertexPositionBuffer.itemSize = 3; //zdefiniowanie liczby współrzednych per wierzchołek
+  vertexPositionBuffer.numItems = 120; //Zdefinoiowanie liczby punktów w naszym buforze
+}
+
+
+
 //let angle = 45.0; //Macierz transformacji świata - określenie położenia kamery
 var angleZ = 0.0;
 var angleY = 0.0;
@@ -210,28 +214,24 @@ function Tick()
   0,0,1,0,
   0,0,0,1
   ];
-
   let uMVRotZ = [
   +Math.cos(angleZ*Math.PI/180.0),+Math.sin(angleZ*Math.PI/180.0),0,0,
   -Math.sin(angleZ*Math.PI/180.0),+Math.cos(angleZ*Math.PI/180.0),0,0,
   0,0,1,0,
   0,0,0,1
   ];
-
   let uMVRotY = [
   +Math.cos(angleY*Math.PI/180.0),0,-Math.sin(angleY*Math.PI/180.0),0,
   0,1,0,0,
   +Math.sin(angleY*Math.PI/180.0),0,+Math.cos(angleY*Math.PI/180.0),0,
   0,0,0,1
   ];
-
   let uMVRotX = [
   1,0,0,0,
   0,+Math.cos(angleX*Math.PI/180.0),+Math.sin(angleX*Math.PI/180.0),0,
   0,-Math.sin(angleX*Math.PI/180.0),+Math.cos(angleX*Math.PI/180.0),0,
   0,0,0,1
   ];
-
   let uMVTranslateZ = [
   1,0,0,0,
   0,1,0,0,
@@ -252,6 +252,8 @@ function Tick()
   uMVMatrix = MatrixMul(uMVMatrix,uMVTranslateZ);
   //alert(uPMatrix);
   
+  CreateAndSelftRotatePlanet();
+
   //Render Scene
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight); 
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // Wyczyszczenie obrazu kolorem czarnym
@@ -287,14 +289,14 @@ function handlekeydown(e)
 {
  if(e.keyCode==87) angleX=angleX+5.0; //W
  if(e.keyCode==83) angleX=angleX-5.0; //S
- if(e.keyCode==68) angleY=angleY+5.0;
- if(e.keyCode==65) angleY=angleY-5.0;
- if(e.keyCode==81) angleZ=angleZ+1.0;
- if(e.keyCode==69) angleZ=angleZ-1.0;
-  if(e.keyCode==37) tx=tx+1;
-  if(e.keyCode==39) tx=tx-1;
-  if(e.keyCode==38) tz=tz+1;
-  if(e.keyCode==40) tz=tz-1;
+ if(e.keyCode==68) angleY=angleY+5.0; //D
+ if(e.keyCode==65) angleY=angleY-5.0; //A
+ if(e.keyCode==81) angleZ=angleZ+1.0; //Q
+ if(e.keyCode==69) angleZ=angleZ-1.0; //E
+  if(e.keyCode==37) tx=tx+1; //Left
+  if(e.keyCode==39) tx=tx-1; //Right
+  if(e.keyCode==38) tz=tz+1; //Up
+  if(e.keyCode==40) tz=tz-1; //Down
 }
 </script>
 </head>
