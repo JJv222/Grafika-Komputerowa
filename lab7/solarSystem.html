@@ -7,6 +7,9 @@ var shaderProgram;
 var uPMatrix;
 var vertexPositionBuffer;
 var vertexColorBuffer;
+var SelfRotates = [];
+var time = [0,0,0,0,0,0,0,0,0,0];
+
 function MatrixMul(a,b) //Mnożenie macierzy
 {
   c = [
@@ -28,9 +31,34 @@ function MatrixMul(a,b) //Mnożenie macierzy
   }
   return c;
 }
-function CreatePlanet( scale,  xStart, yStart, shift=0){
+
+function RotatePlanetX(angle, planetVertices, centerX, centerY, centerZ) {
+  let rotatedPlanet = [];
+
+  for (let i = 0; i < planetVertices.length; i += 3) {
+    let x = planetVertices[i] - centerX; // Przesunięcie względem centrum planety
+    let y = planetVertices[i + 1];
+    let z = planetVertices[i + 2] - centerZ; // Przesunięcie względem centrum planety
+
+    // Obliczenie nowych współrzędnych po rotacji wokół osi Y
+    let newX = x * Math.cos(angle) + z * Math.sin(angle);
+    let newY = y;
+    let newZ = -x * Math.sin(angle) + z * Math.cos(angle);
+
+    // Przesunięcie z powrotem do globalnego układu współrzędnych
+    newX += centerX;
+    newZ += centerZ;
+
+    // Dodanie obliczonych współrzędnych do tablicy wynikowej
+    rotatedPlanet.push(newX, newY, newZ);
+  }
+
+  return rotatedPlanet;
+}
+
+function CreatePlanet( scale,  xStart, yStart, shift=0,SelfRotateX=0){
   let xLeft = xStart - (1.0*scale);
-  let xRight = xStart + (1.0*scale);
+  let xRight = xStart  + (1.0*scale);
   let scaleRight= scale*1.0;
   let scaleLeft= -scale*1.0;
   let outputVextexPosition = [ 
@@ -53,7 +81,7 @@ function CreatePlanet( scale,  xStart, yStart, shift=0){
   xLeft, scaleLeft+yStart, scaleRight+shift,  xLeft, scaleLeft+yStart, scaleLeft+shift,  xRight, scaleLeft+yStart, scaleRight+shift,
   xRight, scaleLeft+yStart, scaleRight+shift,  xLeft, scaleLeft+yStart, scaleLeft+shift,  xRight, scaleLeft+yStart, scaleLeft+shift,
   ]
-
+  outputVextexPosition = RotatePlanetX(SelfRotateX, outputVextexPosition, xStart, yStart, shift);
   return outputVextexPosition;
 }
 function CreateTexture( itemNumber){
@@ -136,6 +164,14 @@ function startGL()
 //Texture Creation
   let vertexCoords = CreateTexture(6);
   vertexCoords = vertexCoords.concat(CreateTexture(9));
+  vertexCoords = vertexCoords.concat(CreateTexture(5));
+  vertexCoords = vertexCoords.concat(CreateTexture(4));
+  vertexCoords = vertexCoords.concat(CreateTexture(3));
+  vertexCoords = vertexCoords.concat(CreateTexture(2));
+  vertexCoords = vertexCoords.concat(CreateTexture(1));
+  vertexCoords = vertexCoords.concat(CreateTexture(0));
+  vertexCoords = vertexCoords.concat(CreateTexture(8));
+  vertexCoords = vertexCoords.concat(CreateTexture(7));
   vertexCoordsBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexCoordsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexCoords), gl.STATIC_DRAW);
@@ -168,20 +204,36 @@ function startGL()
   Tick();
 } 
 
-var SelfRotates = [];
+function TimeManager(){
+  time[0] += Math.PI / 180; 
+  time[1] += (Math.PI-3.2 )/ 180;
+  time[3] += (Math.PI-2.5) / 180;  
+
+
+
+  for(let i = 0; i<time.length; i++){
+    if(time[i] > 2*Math.PI){
+      time[i] = 0;
+    }
+  }
+}
+
 function CreateAndSelftRotatePlanet(){
-  // Planet Creation
-  let time = new Date().getTime() * 0.001; // Get current time in milliseconds and convert to seconds for smoother motion
   let Start_X = 0.0; 
-  let Start_Radius = 21.0; 
+  let Start_Radius = 21.0;  
+  TimeManager();
 //Sun
-let vertexPosition = CreatePlanet(25.0,-15.0,0.0); //sun 
-Start_X = Start_X + 25.0;
-  let mercuryX = ((Start_X+w)*Math.cos(time))-15;
-  let mercuryZ =  (Start_X+25)*Math.sin(time);
-
-
-  vertexPosition = vertexPosition.concat(CreatePlanet(3, mercuryX, 0,mercuryZ)); // mercuryw
+  let vertexPosition = CreatePlanet(25.0,-15.0,0.0,1); //sun 
+  Start_X = Start_X + 25.0+10;
+  let mercuryX = ((Start_X*Math.SQRT2)*Math.cos(time[3]))-15;
+  let mercuryZ =  (Start_X*Math.SQRT2)*Math.sin(time[3]);
+//Mercury
+  vertexPosition = vertexPosition.concat(CreatePlanet(1, mercuryX,0,mercuryZ,time[0])); // mercuryw
+  Start_X = Start_X + 14.0;
+  mercuryX = ((Start_X*Math.SQRT2)*Math.cos(time[1]))-15;
+  mercuryZ =  (Start_X*Math.SQRT2)*Math.sin(time[1]);
+//Venus
+  vertexPosition = vertexPosition.concat(CreatePlanet(2.3, mercuryX, 0,mercuryZ,time[0])); // venus
 
 
 
